@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,6 +67,16 @@ public class ResourceManager : MonoBehaviour
     public float GetQuantityAmountByType(string typeName)
     {
         return ResourceTypeQuantityAndProductionPerSecond[typeName].typeQuantity;
+    }
+
+    public void ConsumeSomeResources(EProductType typeOfResource, float amountToConsume)
+    {
+        ResourceTypeQuantityAndProductionPerSecond[typeOfResource.DescriptionOfEnum()].typeQuantity -= amountToConsume;
+    }
+
+    public float GetQuantityAmountByType(EProductType typeOfResource)
+    {
+        return ResourceTypeQuantityAndProductionPerSecond[typeOfResource.DescriptionOfEnum()].typeQuantity;
     }
 
     private void PrintSomeInformation()

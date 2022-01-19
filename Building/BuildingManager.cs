@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -37,7 +35,7 @@ public class BuildingManager : MonoBehaviour
 
     private void Start()
     {
-        
+
     }
 
     void Update()
@@ -51,7 +49,12 @@ public class BuildingManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(LEFT_MOUSE_CODE) && isNotOverAnObject && canPlace)
         {
-            InstantiateANewBuildingIfNotNull(mousePositionInWorld);
+            var haveResourcesToInstantiate = CheckIfIHaveResourcesToPlaceANewBuildingAndConsumeResource();
+
+            if (haveResourcesToInstantiate)
+            {
+                InstantiateANewBuildingIfNotNull(mousePositionInWorld);
+            }
         }
 
         if (isOverAObject || !canPlace)
@@ -63,9 +66,39 @@ public class BuildingManager : MonoBehaviour
             BuildingGhost.Instance.SetMouseSpriteAsValid();
         }
 
-        if(buildingTypeSOActual != null)
+        if (buildingTypeSOActual != null)
             AttQuantityBonusOfResourceAmount(mousePositionInWorld);
     }
+
+    private bool CheckIfIHaveResourcesToPlaceANewBuildingAndConsumeResource()
+    {
+        if (buildingTypeSOActual == null)
+            return false;
+
+        if(buildingTypeSOActual.buildingCosts.Count == 0)
+            return true;
+
+        var iHaveSomeResourceThatICanntAford = false;
+        foreach (var buildCost in buildingTypeSOActual.buildingCosts)
+        {
+            var quantityToBuild = buildCost.quantityOfThisResource;
+            var quantityInResourceManagerAlreadyInGame = ResourceManager.Instace.GetQuantityAmountByType(buildCost.productType);
+
+            if(quantityInResourceManagerAlreadyInGame < quantityToBuild)
+            {
+                iHaveSomeResourceThatICanntAford = true;
+            }
+        }
+
+        var canBuild = !iHaveSomeResourceThatICanntAford;
+
+        if (canBuild)
+            buildingTypeSOActual.buildingCosts.ForEach(buildCost => ConsumeSomeResources(buildCost.productType, buildCost.quantityOfThisResource));
+
+        return canBuild;
+    }
+
+    private void ConsumeSomeResources(EProductType resourceType, float amountToConsume) => ResourceManager.Instace.ConsumeSomeResources(resourceType, amountToConsume);
 
     private void AttQuantityBonusOfResourceAmount(Vector3 mousePositionInWorld)
     {

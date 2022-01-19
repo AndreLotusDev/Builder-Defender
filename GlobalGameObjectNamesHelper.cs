@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class GlobalGameObjectNamesHelper 
 {
     public const string TXT_ABOUT_HOW_MUCH_RESOURCE_ARE_BEING_GENERATED = "countingProduction";
